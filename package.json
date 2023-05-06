@@ -1,0 +1,39 @@
+{
+  "name": "@robinthomas/serverless-secrets",
+  "version": "0.1.0",
+  "description": "Serverless plugin to load AWS Secrets Manager secrets and export as environment variables",
+  "author": "Robin Thomas <robinthomas2591@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "serverless",
+    "aws-secrets-manager",
+    "serverless-secrets",
+    "aws-lambda"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "lint": "eslint src/ --ext .ts"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.408.0",
+    "@tsconfig/node18": "^18.2.1",
+    "@typescript-eslint/eslint-plugin": "^6.6.0",
+    "@typescript-eslint/parser": "^6.6.0",
+    "eslint": "^8.48.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.3",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  }
+}
