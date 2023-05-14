@@ -1,5 +1,5 @@
 {
-  "name": "serverless-secrets",
+  "name": "serverless-aws-secrets",
   "version": "0.1.0",
   "description": "Serverless plugin to load AWS Secrets Manager secrets and export as environment variables",
   "author": "Robin Thomas <robinthomas2591@gmail.com>",
