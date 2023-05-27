@@ -1,9 +1,13 @@
 {
   "name": "serverless-aws-secrets",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Serverless plugin to load AWS Secrets Manager secrets and export as environment variables",
   "author": "Robin Thomas <robinthomas2591@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robin-thomas/serverless-aws-secrets"
+  },
   "keywords": [
     "serverless",
     "aws-secrets-manager",
@@ -11,7 +15,6 @@
     "aws-lambda"
   ],
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",

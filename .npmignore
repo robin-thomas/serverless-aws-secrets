@@ -1,6 +1,6 @@
 .github
 .husky
-dist/index.d.mts
+dist/index.types.js
 src
 .eslintrc.yml
 .lintstagedrc.yml
