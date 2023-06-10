@@ -1,19 +1,21 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
-import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions } from './index.types';
+import type { Serverless, ServerlessSecretHooks } from './index.types';
 
 class ServerlessAWSSecret {
   private readonly hooks: ServerlessSecretHooks;
-  private readonly prefix: string;
+  private readonly options: Serverless['service']['custom']['serverless-aws-secret'];
   private readonly providerCopy: Serverless['service']['provider'];
   private readonly region: string;
   private readonly secretId: string;
+  private readonly secretPrefix: string;
 
-  constructor(serverless: Serverless, options: ServerlessSecretOptions) {
-    const { app, service, provider } = serverless.service;
-    this.secretId = `${provider.stage}/${app}-${service}`;
+  constructor(serverless: Serverless) {
+    const { custom, provider } = serverless.service;
+    this.options = custom['serverless-aws-secret'];
 
-    this.prefix = options?.prefix ?? 'secret:';
+    this.secretId = this.getSecretId(serverless);
+    this.secretPrefix = this.getSecretPrefix();
 
     this.region = provider.region;
     this.providerCopy = provider;
@@ -37,8 +39,8 @@ class ServerlessAWSSecret {
     const secrets = JSON.parse(SecretString);
 
     for (const [key, value] of Object.entries(this.providerCopy.environment)) {
-      if (value?.startsWith(this.prefix)) {
-        const secretKey = value.replace(this.prefix, '');
+      if (value?.startsWith(this.secretPrefix)) {
+        const secretKey = value.replace(this.secretPrefix, '');
 
         if (!secrets[secretKey]) {
           throw new Error(`Secret ${secretKey} do not exist`);
@@ -47,6 +49,20 @@ class ServerlessAWSSecret {
         this.providerCopy.environment[key] = secrets[secretKey];
       }
     }
+  }
+
+  private getSecretId(serverless: Serverless) {
+    if (this.options?.secretId) {
+      return this.options.secretId;
+    }
+
+    const { app, service, provider } = serverless.service;
+
+    return `${provider.stage}/${app}-${service}`;
+  }
+
+  private getSecretPrefix() {
+    return this.options?.prefix ?? 'secret:';
   }
 }
 

@@ -2,9 +2,9 @@
 
 A Serverless Plugin for the [Serverless Framework](https://www.serverless.com/), which can replace environment variables with secrets from AWS Secrets Manager.
 
-Secrets are recognized as environment variables whose name started with `SECRET:`.
+Secrets are recognized as environment variables whose name started with a pre-defined prefix. Refer to `secretPrefix` configuration below.
 
-It will then try to download the secret from AWS Secrets Manager under the location: `${provider.stage}/${app}-${service}`.
+It will then try to download the secret from AWS Secrets Manager under the location set in `secretId`.
 
 ### Installation
 
@@ -20,3 +20,18 @@ Add the plugin to `serverless.yml`:
 plugins:
   - serverless-aws-secrets
 ```
+
+### Configuration
+
+The plugin can be configured by:
+
+```
+custom:
+  serverless-aws-secrets:
+    secretId: ...
+    secretPrefix: ...
+```
+
+* `secretId`: Location of the secret in AWS Secrets Manager. Default: `${provider.stage}/${app}-${service}`
+
+* `secretPrefix`: Prefix of the secret name in AWS Secrets Manager. Default: `SECRET:`
