@@ -1,10 +1,10 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
-import type { Serverless, ServerlessSecretHooks } from './index.types';
+import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions } from './index.types';
 
 class ServerlessAWSSecret {
   private readonly hooks: ServerlessSecretHooks;
-  private readonly options: Serverless['service']['custom']['serverless-aws-secret'];
+  readonly options: ServerlessSecretOptions;
   private readonly providerCopy: Serverless['service']['provider'];
   private readonly region: string;
   private readonly secretId: string;
@@ -12,7 +12,7 @@ class ServerlessAWSSecret {
 
   constructor(serverless: Serverless) {
     const { custom, provider } = serverless.service;
-    this.options = custom['serverless-aws-secret'];
+    this.options = custom?.['serverless-aws-secrets'] ?? {};
 
     this.secretId = this.getSecretId(serverless);
     this.secretPrefix = this.getSecretPrefix();
@@ -21,8 +21,8 @@ class ServerlessAWSSecret {
     this.providerCopy = provider;
 
     this.hooks = {
-      'before:package:initialize': () => this.loadSecrets(),
-      'offline:start:init': () => this.loadSecrets(),
+      'before:package:initialize': this.loadSecrets,
+      'offline:start:init': this.loadSecrets,
     };
   }
 
@@ -51,7 +51,7 @@ class ServerlessAWSSecret {
     }
   }
 
-  private getSecretId(serverless: Serverless) {
+  getSecretId(serverless: Serverless) {
     if (this.options?.secretId) {
       return this.options.secretId;
     }
@@ -61,8 +61,8 @@ class ServerlessAWSSecret {
     return `${provider.stage}/${app}-${service}`;
   }
 
-  private getSecretPrefix() {
-    return this.options?.secretPrefix ?? 'secret:';
+  getSecretPrefix() {
+    return this.options?.secretPrefix ?? 'SECRET:';
   }
 }
 
