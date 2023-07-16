@@ -1,7 +1,7 @@
 {
   "name": "serverless-aws-secrets",
   "version": "0.3.0",
-  "description": "Serverless plugin to load AWS Secrets Manager secrets and export as environment variables",
+  "description": "Serverless plugin to load AWS Secrets Manager secrets using environment variables",
   "author": "Robin Thomas <robinthomas2591@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -25,6 +25,8 @@
     "@aws-sdk/client-secrets-manager": "^3.408.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
     "@tsconfig/node18": "^18.2.1",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
