@@ -1,0 +1,27 @@
+name: PR
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  code_analysis:
+    name: Code Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Downloading repo
+        uses: actions/checkout@v4
+      - name: Setting up NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Installing dependencies
+        run: npm ci
+      - name: Running linter
+        run: npm run lint
+      - name: Running unit tests
+        run: npm run test
+      - name: Verify plugin can be built
+        run: npm run build
