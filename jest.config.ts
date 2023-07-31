@@ -5,14 +5,15 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
+  testEnvironment: 'node',
+  collectCoverage: true,
+  coverageDirectory: '<rootDir>/../coverage',
   coverageThreshold: {
     global: {
       branches: 99,
       statements: 99,
     },
   },
-  testEnvironment: 'node',
-  collectCoverage: true,
 }
 
 export default config;
