@@ -8,7 +8,7 @@ on:
 jobs:
   code_analysis:
     name: Code Analysis
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Downloading repo
         uses: actions/checkout@v4
