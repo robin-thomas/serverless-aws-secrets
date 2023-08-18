@@ -7,6 +7,7 @@ on:
 
 jobs:
   release:
+    name: Release package
     runs-on: ubuntu-latest
     steps:
       - name: Downloading repo
@@ -21,6 +22,8 @@ jobs:
         run: npm ci
       - name: Bumping version
         run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           npm version ${{ github.ref_name }}
           git push
       # - name: Publishing package
