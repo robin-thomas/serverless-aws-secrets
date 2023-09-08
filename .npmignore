@@ -1,0 +1,9 @@
+.github
+.husky
+dist/index.d.mts
+src
+.eslintrc.yml
+.lintstagedrc.yml
+.prettierrc.yml
+package-lock.json
+tsconfig.json

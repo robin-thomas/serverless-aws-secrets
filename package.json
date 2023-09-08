@@ -1,5 +1,5 @@
 {
-  "name": "@robinthomas/serverless-secrets",
+  "name": "serverless-secrets",
   "version": "0.1.0",
   "description": "Serverless plugin to load AWS Secrets Manager secrets and export as environment variables",
   "author": "Robin Thomas <robinthomas2591@gmail.com>",
@@ -23,7 +23,8 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
-    "lint": "eslint src/ --ext .ts"
+    "lint": "eslint src/ --ext .ts",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.408.0"
