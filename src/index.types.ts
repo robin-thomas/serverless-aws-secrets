@@ -2,6 +2,12 @@ export interface Serverless {
   service: {
     app: string;
     service: string;
+    custom: {
+      'serverless-aws-secret': {
+        prefix?: string;
+        secretId?: string;
+      };
+    };
     provider: {
       stage: string;
       region: string;
@@ -10,10 +16,6 @@ export interface Serverless {
       };
     };
   };
-}
-
-export interface ServerlessSecretOptions {
-  prefix?: string;
 }
 
 export interface ServerlessSecretHooks {
