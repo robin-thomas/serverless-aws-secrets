@@ -1,4 +1,4 @@
-# Serverless Secrets
+# Serverless AWS Secrets
 
 A Serverless Plugin for the [Serverless Framework](https://www.serverless.com/), which can replace environment variables with secrets from AWS Secrets Manager.
 
@@ -11,12 +11,12 @@ It will then try to download the secret from AWS Secrets Manager under the locat
 Run below command to install the plugin:
 
 ```
-$ npm install --save-dev serverless-secrets
+$ npm install --save-dev serverless-aws-secrets
 ```
 
 Add the plugin to `serverless.yml`:
 
 ```
 plugins:
-  - serverless-secrets
+  - serverless-aws-secrets
 ```
