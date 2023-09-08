@@ -2,14 +2,8 @@ export interface Serverless {
   service: {
     app: string;
     service: string;
-    custom: {
-      'serverless-aws-secret': {
-        /** @dev Environment variables with values that start with this prefix are treated as secrets */
-        secretPrefix?: string;
-
-        /** @dev Secret to search for within AWS Secrets Manager */
-        secretId?: string;
-      };
+    custom?: {
+      'serverless-aws-secrets': ServerlessSecretOptions;
     };
     provider: {
       stage: string;
@@ -23,4 +17,12 @@ export interface Serverless {
 
 export interface ServerlessSecretHooks {
   [key: string]: () => void;
+}
+
+export interface ServerlessSecretOptions {
+  /** @dev Environment variables with values that start with this prefix are treated as secrets */
+  secretPrefix?: string;
+
+  /** @dev Secret to search for within AWS Secrets Manager */
+  secretId?: string;
 }
