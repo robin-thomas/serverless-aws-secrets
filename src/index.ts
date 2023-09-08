@@ -2,10 +2,10 @@ import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-sec
 
 import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions } from './index.types';
 
-export default class ServerlessSecret {
+export default class ServerlessAWSSecret {
   private readonly hooks: ServerlessSecretHooks;
   private readonly prefix: string;
-  private readonly provider: Serverless['service']['provider'];
+  private readonly providerCopy: Serverless['service']['provider'];
   private readonly region: string;
   private readonly secretId: string;
 
@@ -16,10 +16,11 @@ export default class ServerlessSecret {
     this.prefix = options?.prefix ?? 'secret:';
 
     this.region = provider.region;
-    this.provider = provider;
+    this.providerCopy = provider;
 
     this.hooks = {
       'before:package:initialize': () => this.loadSecrets(),
+      'offline:start:init': () => this.loadSecrets(),
     };
   }
 
@@ -35,7 +36,7 @@ export default class ServerlessSecret {
 
     const secrets = JSON.parse(SecretString);
 
-    for (const [key, value] of Object.entries(this.provider.environment)) {
+    for (const [key, value] of Object.entries(this.providerCopy.environment)) {
       if (value?.startsWith(this.prefix)) {
         const secretKey = value.replace(this.prefix, '');
 
@@ -43,7 +44,7 @@ export default class ServerlessSecret {
           throw new Error(`Secret ${secretKey} do not exist`);
         }
 
-        this.provider.environment[key] = secrets[secretKey];
+        this.providerCopy.environment[key] = secrets[secretKey];
       }
     }
   }

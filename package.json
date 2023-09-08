@@ -1,6 +1,6 @@
 {
   "name": "serverless-aws-secrets",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Serverless plugin to load AWS Secrets Manager secrets and export as environment variables",
   "author": "Robin Thomas <robinthomas2591@gmail.com>",
   "license": "MIT",
@@ -10,19 +10,11 @@
     "serverless-secrets",
     "aws-lambda"
   ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
-    }
-  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build": "tsc",
     "lint": "eslint src/ --ext .ts",
     "prepublishOnly": "npm run build"
   },
@@ -38,6 +30,6 @@
     "lint-staged": "^14.0.1",
     "prettier": "^3.0.3",
     "rimraf": "^5.0.1",
-    "tsup": "^7.2.0"
+    "typescript": "^5.2.2"
   }
 }

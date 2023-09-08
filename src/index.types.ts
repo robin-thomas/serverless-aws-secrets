@@ -17,5 +17,5 @@ export interface ServerlessSecretOptions {
 }
 
 export interface ServerlessSecretHooks {
-  'before:package:initialize': () => void;
+  [key: string]: () => void;
 }
