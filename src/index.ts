@@ -62,7 +62,7 @@ class ServerlessAWSSecret {
   }
 
   private getSecretPrefix() {
-    return this.options?.prefix ?? 'secret:';
+    return this.options?.secretPrefix ?? 'secret:';
   }
 }
 

@@ -4,7 +4,10 @@ export interface Serverless {
     service: string;
     custom: {
       'serverless-aws-secret': {
-        prefix?: string;
+        /** @dev Environment variables with values that start with this prefix are treated as secrets */
+        secretPrefix?: string;
+
+        /** @dev Secret to search for within AWS Secrets Manager */
         secretId?: string;
       };
     };
