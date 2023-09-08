@@ -2,7 +2,7 @@ import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-sec
 
 import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions } from './index.types';
 
-export default class ServerlessAWSSecret {
+class ServerlessAWSSecret {
   private readonly hooks: ServerlessSecretHooks;
   private readonly prefix: string;
   private readonly providerCopy: Serverless['service']['provider'];
@@ -49,3 +49,5 @@ export default class ServerlessAWSSecret {
     }
   }
 }
+
+export = ServerlessAWSSecret;
