@@ -1,9 +1,13 @@
 .github
 .husky
+coverage
 dist/index.types.js
+dist/index.spec.js
 src
+.commitlintrc.yaml
 .eslintrc.yml
 .lintstagedrc.yml
 .prettierrc.yml
+jest.config.ts
 package-lock.json
 tsconfig.json
