@@ -21,6 +21,12 @@ jobs:
         run: npm ci
       - name: Running linter
         run: npm run lint
+      - name: Configure dummy AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: 'dummy key id'
+          aws-secret-access-key: 'dummy secret key'
+          aws-region: 'eu-west-1'
       - name: Running unit tests
         run: npm run test
       - name: Verify plugin can be built
