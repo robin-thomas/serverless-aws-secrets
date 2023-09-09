@@ -27,7 +27,7 @@ jobs:
           npm version --no-git-tag-version ${{ github.ref_name }}
           git add package.json package-lock.json
           git commit -m "${{ github.ref_name }}"
-      # - name: Publishing package
-      #   run: npm publish
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publishing package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
