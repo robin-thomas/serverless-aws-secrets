@@ -24,7 +24,9 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          npm --no-git-tag-version version ${{ github.ref_name }}
+          npm version --no-git-tag-version ${{ github.ref_name }}
+          git add package.json package-lock.json
+          git commit -m "${{ github.ref_name }}"
           git push
       # - name: Publishing package
       #   run: npm publish
