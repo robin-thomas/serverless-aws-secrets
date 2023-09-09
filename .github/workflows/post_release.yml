@@ -1,0 +1,29 @@
+name: Release Package
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Downloading repo
+        uses: actions/checkout@v4
+      - name: Setting up NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Installing dependencies
+        run: npm ci
+      - name: Bumping version
+        run: |
+          npm version ${{ github.ref_name }}
+          git push
+      # - name: Publishing package
+      #   run: npm publish
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
