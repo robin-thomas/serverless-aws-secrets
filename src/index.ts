@@ -21,8 +21,8 @@ class ServerlessAWSSecret {
     this.providerCopy = provider;
 
     this.hooks = {
-      'before:package:initialize': this.loadSecrets,
-      'offline:start:init': this.loadSecrets,
+      'before:package:initialize': this.loadSecrets.bind(this),
+      'offline:start:init': this.loadSecrets.bind(this),
     };
   }
 
