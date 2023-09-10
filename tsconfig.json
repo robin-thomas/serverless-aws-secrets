@@ -2,7 +2,8 @@
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "declaration": false
+    "declaration": false,
+    "strictPropertyInitialization": false
   },
   "include": [
     "src"

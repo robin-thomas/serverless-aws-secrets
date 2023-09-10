@@ -3,20 +3,15 @@ import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-sec
 import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions } from './index.types';
 
 class ServerlessAWSSecret {
-  private readonly hooks: ServerlessSecretHooks;
-  readonly options: ServerlessSecretOptions;
-  private readonly providerCopy: Serverless['service']['provider'];
-  private readonly region: string;
-  private readonly secretId: string;
-  private readonly secretPrefix: string;
+  hooks: ServerlessSecretHooks;
+  options: ServerlessSecretOptions;
+  providerCopy: Serverless['service']['provider'];
+  region: string;
 
   constructor(serverless: Serverless) {
-    const { custom, provider } = serverless.service;
-    this.options = custom?.['serverless-aws-secrets'] ?? {};
+    this.setOptions(serverless);
 
-    this.secretId = this.getSecretId(serverless);
-    this.secretPrefix = this.getSecretPrefix();
-
+    const { provider } = serverless.service;
     this.region = provider.region;
     this.providerCopy = provider;
 
@@ -28,19 +23,19 @@ class ServerlessAWSSecret {
 
   async loadSecrets() {
     const client = new SecretsManagerClient({ region: this.region });
-    const command = new GetSecretValueCommand({ SecretId: this.secretId });
+    const command = new GetSecretValueCommand({ SecretId: this.options.secretId });
 
     const { SecretString } = await client.send(command);
 
     if (!SecretString) {
-      throw new Error(`Failed to retrieve the secret: ${this.secretId}`);
+      throw new Error(`Failed to retrieve the secret: ${this.options.secretId}`);
     }
 
     const secrets = JSON.parse(SecretString);
 
     for (const [key, value] of Object.entries(this.providerCopy.environment)) {
-      if (value?.startsWith(this.secretPrefix)) {
-        const secretKey = value.replace(this.secretPrefix, '');
+      if (value?.startsWith(this.options.secretPrefix!)) {
+        const secretKey = value.replace(this.options.secretPrefix!, '');
 
         if (!secrets[secretKey]) {
           throw new Error(`Secret ${secretKey} do not exist`);
@@ -49,6 +44,13 @@ class ServerlessAWSSecret {
         this.providerCopy.environment[key] = secrets[secretKey];
       }
     }
+  }
+
+  setOptions(serverless: Serverless) {
+    this.options = serverless.service.custom?.['serverless-aws-secrets'] ?? {};
+
+    this.options.secretId = this.getSecretId(serverless);
+    this.options.secretPrefix = this.getSecretPrefix();
   }
 
   getSecretId(serverless: Serverless) {
