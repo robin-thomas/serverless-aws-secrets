@@ -33,6 +33,7 @@ class ServerlessAWSSecret {
 
     const secrets = JSON.parse(SecretString);
 
+    let replaceCount = 0;
     for (const [key, value] of Object.entries(this.providerCopy.environment)) {
       if (value?.startsWith(this.options.secretPrefix!)) {
         const secretKey = value.replace(this.options.secretPrefix!, '');
@@ -41,9 +42,17 @@ class ServerlessAWSSecret {
           throw new Error(`Secret ${secretKey} do not exist`);
         }
 
+        if (this.options.verbose) {
+          console.log(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
+        }
+
         this.providerCopy.environment[key] = secrets[secretKey];
+
+        ++replaceCount;
       }
     }
+
+    console.log(`[serverless-aws-secrets]: Replaced ${replaceCount} secrets in environment variables`);
   }
 
   setOptions(serverless: Serverless) {
