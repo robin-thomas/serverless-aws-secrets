@@ -20,9 +20,21 @@ export interface ServerlessSecretHooks {
 }
 
 export interface ServerlessSecretOptions {
-  /** @dev Environment variables with values that start with this prefix are treated as secrets */
+  /**
+   * @dev Environment variables with values that start with this prefix are treated as secrets
+   * @default "SECRET:"
+   */
   secretPrefix?: string;
 
-  /** @dev Secret to search for within AWS Secrets Manager */
+  /**
+   * @dev Secret to search for within AWS Secrets Manager
+   * @default `${stage}/${app}-${service}`
+   */
   secretId?: string;
+
+  /**
+   * @dev Enable verbose logging.
+   * @default false
+   */
+  verbose?: boolean;
 }
