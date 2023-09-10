@@ -51,6 +51,7 @@ class ServerlessAWSSecret {
 
     this.options.secretId = this.getSecretId(serverless);
     this.options.secretPrefix = this.getSecretPrefix();
+    this.options.verbose = this.options.verbose ?? false;
   }
 
   getSecretId(serverless: Serverless) {
