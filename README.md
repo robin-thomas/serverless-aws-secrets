@@ -48,6 +48,6 @@ custom:
 
 * `secretId`: Location of the secret in AWS Secrets Manager. Default: `${provider.stage}/${app}-${service}`
 
-* `secretPrefix`: Prefix of the secret name in AWS Secrets Manager. Default: `SECRET:`
+* `secretPrefix`: Prefix of the secret name in AWS Secrets Manager. Default: `secret:`
 
 * `verbose`: Enable verbose logging. Default: `false`
