@@ -22,7 +22,7 @@ describe('index.ts', () => {
 
       const plugin = new ServerlesssAwsSecrets(serverless);
       expect(plugin.getSecretId(serverless)).toBe('stage/app-service');
-      expect(plugin.getSecretPrefix()).toBe('SECRET:');
+      expect(plugin.getSecretPrefix()).toBe('secret:');
     });
 
     test('secretPrefix is not set', () => {
@@ -40,7 +40,7 @@ describe('index.ts', () => {
 
       const plugin = new ServerlesssAwsSecrets(serverless);
       expect(plugin.getSecretId(serverless)).toBe('secretId');
-      expect(plugin.getSecretPrefix()).toBe('SECRET:');
+      expect(plugin.getSecretPrefix()).toBe('secret:');
     });
 
     test('All options are not set', () => {
@@ -66,7 +66,7 @@ describe('index.ts', () => {
     test('if verbose is set, its value is used', async () => {
       const serverless = getServerless();
       serverless.service.custom = { 'serverless-aws-secrets': { verbose: true } };
-      serverless.service.provider.environment = { MYSQL_PASSWORD: 'SECRET:MYSQL_PASSWORD' };
+      serverless.service.provider.environment = { MYSQL_PASSWORD: 'secret:MYSQL_PASSWORD' };
 
       nock(/secretsmanager.eu-west-1.amazonaws.com/)
         .post('/')
@@ -107,7 +107,7 @@ describe('index.ts', () => {
 
     test('found the secret, but secret key missing', async () => {
       const serverless = getServerless();
-      serverless.service.provider.environment = { MYSQL_PASSWORD: 'SECRET:MYSQL_PASSWORD' };
+      serverless.service.provider.environment = { MYSQL_PASSWORD: 'secret:MYSQL_PASSWORD' };
 
       nock(/secretsmanager.eu-west-1.amazonaws.com/)
         .post('/')
@@ -119,7 +119,7 @@ describe('index.ts', () => {
 
     test('found the secret, secret key is present', async () => {
       const serverless = getServerless();
-      serverless.service.provider.environment = { MYSQL_PASSWORD: 'SECRET:MYSQL_PASSWORD' };
+      serverless.service.provider.environment = { MYSQL_PASSWORD: 'secret:MYSQL_PASSWORD' };
 
       nock(/secretsmanager.eu-west-1.amazonaws.com/)
         .post('/')
