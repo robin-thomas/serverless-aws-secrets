@@ -11,8 +11,8 @@ Rather than storing secrets in your `.env.*` file in your GitHub repo, you can i
 For example, assume there are environment variables in your `.env.*` file like:
 
 ```
-MYSQL_USERNAME=SECRET:MYSQL_USERNAME
-MYSQL_PASSWORD=SECRET:MYSQL_PASSWORD
+MYSQL_USERNAME=secret:MYSQL_USERNAME
+MYSQL_PASSWORD=secret:MYSQL_PASSWORD
 ```
 
 The plugin will then search within AWS Secrets Manager (refer to `secretId` configuration) for a secret with the name `MYSQL_USERNAME` and `MYSQL_PASSWORD` and replace the environment variables with the secret value.
