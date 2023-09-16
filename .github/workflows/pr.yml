@@ -26,5 +26,9 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: 'dummy_key_id'
           AWS_SECRET_ACCESS_KEY: 'dummy_secret_key'
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Verify plugin can be built
         run: npm run build
