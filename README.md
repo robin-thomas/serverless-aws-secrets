@@ -1,10 +1,19 @@
-# Serverless AWS Secrets
+<p align="center">
+  <h2 align="center">Serverless AWS Secrets</h2>
+  <p align="center">A Serverless Plugin for the <a href="https://www.serverless.com">Serverless Framework</a>, which can replace environment variables with secrets from AWS Secrets Manager.</p>
+</p>
 
-![](https://img.shields.io/npm/l/serverless-aws-secrets)
-![](https://img.shields.io/npm/dt/serverless-aws-secrets.svg?label=Downloads)
-![](https://img.shields.io/bundlephobia/min/serverless-aws-secrets/latest)
-
-A Serverless Plugin for the [Serverless Framework](https://www.serverless.com/), which can replace environment variables with secrets from AWS Secrets Manager.
+<p align="center">
+  <img src="https://img.shields.io/npm/l/serverless-aws-secrets" />
+  <img src="https://img.shields.io/npm/dt/serverless-aws-secrets.svg?label=Downloads" />
+  <img src="https://img.shields.io/bundlephobia/min/serverless-aws-secrets/latest" />
+  <a href="https://github.com/robin-thomas/serverless-aws-secrets/actions">
+    <img src="https://github.com/robin-thomas/serverless-aws-secrets/actions/workflows/post_release.yml/badge.svg" />
+  </a>
+  <a href="https://codecov.io/gh/robin-thomas/serverless-aws-secrets">
+    <img src="https://codecov.io/gh/robin-thomas/serverless-aws-secrets/graph/badge.svg?token=I3FAWZETH9)" />
+  </a>
+</p>
 
 Rather than storing secrets in your `.env.*` file in your GitHub repo, you can instead store them in AWS Secrets Manager. This plugin will then replace the environment variables (that are already loaded into Serverless framework) with the secrets from AWS Secrets Manager.
 
