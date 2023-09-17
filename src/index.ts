@@ -5,15 +5,12 @@ import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions } from 
 class ServerlessAWSSecret {
   hooks: ServerlessSecretHooks;
   options: ServerlessSecretOptions;
-  providerCopy: Serverless['service']['provider'];
-  region: string;
+  serverless: Serverless;
 
   constructor(serverless: Serverless) {
     this.setOptions(serverless);
 
-    const { provider } = serverless.service;
-    this.region = provider.region;
-    this.providerCopy = provider;
+    this.serverless = serverless;
 
     this.hooks = {
       'before:package:initialize': this.loadSecrets.bind(this),
@@ -22,7 +19,7 @@ class ServerlessAWSSecret {
   }
 
   async loadSecrets() {
-    const client = new SecretsManagerClient({ region: this.region });
+    const client = new SecretsManagerClient({ region: this.serverless.service.provider.region });
     const command = new GetSecretValueCommand({ SecretId: this.options.secretId });
 
     const { SecretString } = await client.send(command);
@@ -34,7 +31,7 @@ class ServerlessAWSSecret {
     const secrets = JSON.parse(SecretString);
 
     let replaceCount = 0;
-    for (const [key, value] of Object.entries(this.providerCopy.environment)) {
+    for (const [key, value] of Object.entries(this.serverless.service.provider.environment)) {
       if (value?.startsWith(this.options.secretPrefix!)) {
         const secretKey = value.replace(this.options.secretPrefix!, '');
 
@@ -46,7 +43,7 @@ class ServerlessAWSSecret {
           console.log(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
         }
 
-        this.providerCopy.environment[key] = secrets[secretKey];
+        this.serverless.service.provider.environment[key] = secrets[secretKey];
 
         ++replaceCount;
       }
