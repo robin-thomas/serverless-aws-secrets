@@ -25,7 +25,7 @@ class ServerlessAWSSecret {
     const { SecretString } = await client.send(command);
 
     if (!SecretString) {
-      throw new Error(`Failed to retrieve the secret: ${this.options.secretId}`);
+      throw new this.serverless.classes.Error(`Failed to retrieve the secret: ${this.options.secretId}`);
     }
 
     const secrets = JSON.parse(SecretString);

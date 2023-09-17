@@ -13,6 +13,9 @@ export interface Serverless {
       };
     };
   };
+  classes: {
+    Error: ErrorConstructor;
+  };
 }
 
 export interface ServerlessSecretHooks {
