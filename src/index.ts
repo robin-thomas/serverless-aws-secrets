@@ -62,10 +62,10 @@ class ServerlessAWSSecret {
     this.options.verbose = this.options.verbose ?? false;
   }
 
-  setLogger(options: ServerlessOptions) {
+  setLogger(options?: ServerlessOptions) {
     this.log = {
-      verbose: options.log?.verbose ?? this.options.verbose ? console.log : () => {},
-      success: options.log?.success ?? console.log,
+      verbose: options?.log?.verbose ?? this.options.verbose ? console.log : () => {},
+      success: options?.log?.success ?? console.log,
     };
   }
 
