@@ -1,16 +1,20 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
-import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions } from './index.types';
+import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions, ServerlessOptions } from './index.types';
 
 class ServerlessAWSSecret {
+  Error: ErrorConstructor;
   hooks: ServerlessSecretHooks;
+  log: NonNullable<ServerlessOptions['log']>;
   options: ServerlessSecretOptions;
   serverless: Serverless;
 
-  constructor(serverless: Serverless) {
+  constructor(serverless: Serverless, cliOptions: unknown, options: ServerlessOptions) {
     this.setOptions(serverless);
+    this.setLogger(options);
 
     this.serverless = serverless;
+    this.Error = serverless.classes?.Error ?? Error;
 
     this.hooks = {
       'before:package:initialize': this.loadSecrets.bind(this),
@@ -25,7 +29,7 @@ class ServerlessAWSSecret {
     const { SecretString } = await client.send(command);
 
     if (!SecretString) {
-      throw new this.serverless.classes.Error(`Failed to retrieve the secret: ${this.options.secretId}`);
+      throw new this.Error(`Failed to retrieve the secret: ${this.options.secretId}`);
     }
 
     const secrets = JSON.parse(SecretString);
@@ -36,12 +40,10 @@ class ServerlessAWSSecret {
         const secretKey = value.replace(this.options.secretPrefix!, '');
 
         if (!secrets[secretKey]) {
-          throw new Error(`Secret ${secretKey} do not exist`);
+          throw new this.Error(`Secret ${secretKey} do not exist`);
         }
 
-        if (this.options.verbose) {
-          console.log(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
-        }
+        this.log.verbose(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
 
         this.serverless.service.provider.environment[key] = secrets[secretKey];
 
@@ -49,7 +51,7 @@ class ServerlessAWSSecret {
       }
     }
 
-    console.log(`[serverless-aws-secrets]: Replaced ${replaceCount} secrets in environment variables`);
+    this.log.success(`[serverless-aws-secrets]: Replaced ${replaceCount} secrets in environment variables`);
   }
 
   setOptions(serverless: Serverless) {
@@ -58,6 +60,13 @@ class ServerlessAWSSecret {
     this.options.secretId = this.getSecretId(serverless);
     this.options.secretPrefix = this.getSecretPrefix();
     this.options.verbose = this.options.verbose ?? false;
+  }
+
+  setLogger(options: ServerlessOptions) {
+    this.log = {
+      verbose: options.log?.verbose ?? this.options.verbose ? console.log : () => {},
+      success: options.log?.success ?? console.log,
+    };
   }
 
   getSecretId(serverless: Serverless) {

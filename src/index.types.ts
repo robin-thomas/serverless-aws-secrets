@@ -13,13 +13,20 @@ export interface Serverless {
       };
     };
   };
-  classes: {
+  classes?: {
     Error: ErrorConstructor;
   };
 }
 
 export interface ServerlessSecretHooks {
   [key: string]: () => void;
+}
+
+export interface ServerlessOptions {
+  log?: {
+    verbose: (message: string) => void;
+    success: (message: string) => void;
+  };
 }
 
 export interface ServerlessSecretOptions {
