@@ -1,6 +1,12 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
-import type { Serverless, ServerlessSecretHooks, ServerlessSecretOptions, ServerlessOptions } from './index.types';
+import type {
+  Serverless,
+  ServerlessSecretHooks,
+  ServerlessSecretOptions,
+  ServerlessOptions,
+  ServerlessCliOptions,
+} from './index.types';
 
 class ServerlessAWSSecret {
   Error: ErrorConstructor;
@@ -9,9 +15,9 @@ class ServerlessAWSSecret {
   options: ServerlessSecretOptions;
   serverless: Serverless;
 
-  constructor(serverless: Serverless, cliOptions: unknown, options: ServerlessOptions) {
+  constructor(serverless: Serverless, cliOptions: ServerlessCliOptions, options: ServerlessOptions) {
     this.setOptions(serverless);
-    this.setLogger(options);
+    this.setLogger(options, cliOptions);
 
     this.serverless = serverless;
     this.Error = serverless.classes?.Error ?? Error;
@@ -59,12 +65,11 @@ class ServerlessAWSSecret {
 
     this.options.secretId = this.getSecretId(serverless);
     this.options.secretPrefix = this.getSecretPrefix();
-    this.options.verbose = this.options.verbose ?? false;
   }
 
-  setLogger(options?: ServerlessOptions) {
+  setLogger(options?: ServerlessOptions, cliOptions?: ServerlessCliOptions) {
     this.log = {
-      verbose: options?.log?.verbose ?? this.options.verbose ? console.log : () => {},
+      verbose: options?.log?.verbose ?? cliOptions?.verbose ? console.log : () => {},
       success: options?.log?.success ?? console.log,
     };
   }

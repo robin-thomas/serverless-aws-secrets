@@ -18,6 +18,10 @@ export interface Serverless {
   };
 }
 
+export interface ServerlessCliOptions {
+  verbose?: boolean;
+}
+
 export interface ServerlessSecretHooks {
   [key: string]: () => void;
 }
@@ -41,10 +45,4 @@ export interface ServerlessSecretOptions {
    * @default `${stage}/${app}-${service}`
    */
   secretId?: string;
-
-  /**
-   * @dev Enable verbose logging.
-   * @default false
-   */
-  verbose?: boolean;
 }
