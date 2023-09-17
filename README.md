@@ -11,7 +11,7 @@
     <img src="http://public.serverless.com/badges/v3.svg" />
   </a>
   <a href="https://www.npmjs.com/package/serverless-aws-secrets">
-    <img src="https://badge.fury.io/js/serverless-aws-secrets.svg" />
+    <img src="https://img.shields.io/npm/v/serverless-aws-secrets" />
   </a>
   <img src="https://img.shields.io/npm/dt/serverless-aws-secrets.svg?label=Downloads" />
   <img src="https://img.shields.io/bundlephobia/min/serverless-aws-secrets/latest" />
