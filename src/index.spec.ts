@@ -11,6 +11,9 @@ const getServerless = (): Serverless => ({
   },
 });
 
+const cliOptions = { verbose: false };
+const serverlessOptions = {};
+
 describe('index.ts', () => {
   beforeEach(() => {
     jest.spyOn(console, 'log').mockImplementation();
@@ -20,7 +23,7 @@ describe('index.ts', () => {
     test('secretId and secretPrefix are not set', () => {
       const serverless = getServerless();
 
-      const plugin = new ServerlesssAwsSecrets(serverless);
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
       expect(plugin.getSecretId(serverless)).toBe('stage/app-service');
       expect(plugin.getSecretPrefix()).toBe('secret:');
     });
@@ -29,7 +32,7 @@ describe('index.ts', () => {
       const serverless = getServerless();
       serverless.service.custom = { 'serverless-aws-secrets': { secretPrefix: 'PREFIX:' } };
 
-      const plugin = new ServerlesssAwsSecrets(serverless);
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
       expect(plugin.getSecretId(serverless)).toBe('stage/app-service');
       expect(plugin.getSecretPrefix()).toBe('PREFIX:');
     });
@@ -38,7 +41,7 @@ describe('index.ts', () => {
       const serverless = getServerless();
       serverless.service.custom = { 'serverless-aws-secrets': { secretId: 'secretId' } };
 
-      const plugin = new ServerlesssAwsSecrets(serverless);
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
       expect(plugin.getSecretId(serverless)).toBe('secretId');
       expect(plugin.getSecretPrefix()).toBe('secret:');
     });
@@ -47,33 +50,39 @@ describe('index.ts', () => {
       const serverless = getServerless();
       serverless.service.custom = { 'serverless-aws-secrets': { secretId: 'secretId', secretPrefix: 'PREFIX:' } };
 
-      const plugin = new ServerlesssAwsSecrets(serverless);
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
       expect(plugin.getSecretId(serverless)).toBe('secretId');
       expect(plugin.getSecretPrefix()).toBe('PREFIX:');
     });
   });
 
   describe('verbose logging', () => {
-    afterAll(() => {
-      nock.cleanAll();
-    });
+    let _serverless: Serverless;
 
-    test('if verbose is not set, its default value is false', () => {
-      const plugin = new ServerlesssAwsSecrets(getServerless());
-      expect(plugin.options.verbose).toBe(false);
-    });
-
-    test('if verbose is set, its value is used', async () => {
-      const serverless = getServerless();
-      serverless.service.custom = { 'serverless-aws-secrets': { verbose: true } };
-      serverless.service.provider.environment = { MYSQL_PASSWORD: 'secret:MYSQL_PASSWORD' };
+    beforeEach(() => {
+      _serverless = getServerless();
+      _serverless.service.provider.environment = { MYSQL_PASSWORD: 'secret:MYSQL_PASSWORD' };
 
       nock(/secretsmanager.eu-west-1.amazonaws.com/)
         .post('/')
         .reply(200, { SecretString: JSON.stringify({ MYSQL_PASSWORD: 'SECRET_MYSQL_PASSWORD' }) });
+    });
 
-      const plugin = new ServerlesssAwsSecrets(serverless);
-      expect(plugin.options.verbose).toBe(true);
+    afterAll(() => {
+      nock.cleanAll();
+    });
+
+    test('if verbose is not set, its default value is false', async () => {
+      const plugin = new ServerlesssAwsSecrets(_serverless, { verbose: false }, serverlessOptions);
+
+      await plugin.loadSecrets();
+      expect(console.log).not.toBeCalledWith(
+        '[serverless-aws-secrets]: Replacing MYSQL_PASSWORD with secret of MYSQL_PASSWORD',
+      );
+    });
+
+    test('if verbose is set, its value is used', async () => {
+      const plugin = new ServerlesssAwsSecrets(_serverless, { verbose: true }, serverlessOptions);
 
       await plugin.loadSecrets();
       expect(console.log).toBeCalledWith(
@@ -92,7 +101,7 @@ describe('index.ts', () => {
         .post('/')
         .reply(400);
 
-      const plugin = new ServerlesssAwsSecrets(getServerless());
+      const plugin = new ServerlesssAwsSecrets(getServerless(), cliOptions, serverlessOptions);
       await expect(plugin.loadSecrets()).rejects.toThrowError();
     });
 
@@ -101,7 +110,7 @@ describe('index.ts', () => {
         .post('/')
         .reply(200);
 
-      const plugin = new ServerlesssAwsSecrets(getServerless());
+      const plugin = new ServerlesssAwsSecrets(getServerless(), cliOptions, serverlessOptions);
       await expect(plugin.loadSecrets()).rejects.toThrowError('Failed to retrieve the secret: stage/app-service');
     });
 
@@ -113,7 +122,7 @@ describe('index.ts', () => {
         .post('/')
         .reply(200, { SecretString: JSON.stringify({}) });
 
-      const plugin = new ServerlesssAwsSecrets(serverless);
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
       await expect(plugin.loadSecrets()).rejects.toThrowError('Secret MYSQL_PASSWORD do not exist');
     });
 
@@ -125,7 +134,7 @@ describe('index.ts', () => {
         .post('/')
         .reply(200, { SecretString: JSON.stringify({ MYSQL_PASSWORD: 'SECRET_MYSQL_PASSWORD' }) });
 
-      const plugin = new ServerlesssAwsSecrets(serverless);
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
 
       await plugin.loadSecrets();
       expect(serverless.service.provider.environment.MYSQL_PASSWORD).toBe('SECRET_MYSQL_PASSWORD');
