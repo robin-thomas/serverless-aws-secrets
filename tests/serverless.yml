@@ -8,6 +8,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs18.x
+  region: ap-southeast-1
 
 functions:
   function1:
