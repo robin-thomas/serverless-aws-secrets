@@ -38,5 +38,5 @@ jobs:
           npm ci
           npx sls package
         env:
-          AWS_ACCESS_KEY_ID: 'dummy_key_id'
-          AWS_SECRET_ACCESS_KEY: 'dummy_secret_key'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
