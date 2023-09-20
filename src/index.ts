@@ -1,5 +1,6 @@
 import type {
   Serverless,
+  ServerlessSecretCommands,
   ServerlessSecretHooks,
   ServerlessSecretOptions,
   ServerlessOptions,
@@ -9,6 +10,7 @@ import { getSecret } from './aws/secret';
 
 class ServerlessAWSSecret {
   Error: ErrorConstructor;
+  commands: ServerlessSecretCommands;
   hooks: ServerlessSecretHooks;
   log: NonNullable<ServerlessOptions['log']>;
   options: ServerlessSecretOptions;
@@ -21,9 +23,16 @@ class ServerlessAWSSecret {
     this.serverless = serverless;
     this.Error = serverless.classes?.Error ?? Error;
 
+    this.commands = {
+      'aws-secrets': {
+        lifecycleEvents: ['load'],
+      },
+    };
+
     this.hooks = {
       'before:package:initialize': this.loadSecrets.bind(this),
       'offline:start:init': this.loadSecrets.bind(this),
+      'aws-secrets:load': this.loadSecrets.bind(this),
     };
   }
 

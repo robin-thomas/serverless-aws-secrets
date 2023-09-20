@@ -33,6 +33,13 @@ export interface ServerlessOptions {
   };
 }
 
+export interface ServerlessSecretCommands {
+  [key: string]: {
+    usage?: string;
+    lifecycleEvents: string[];
+  };
+}
+
 export interface ServerlessSecretOptions {
   /**
    * @dev Environment variables with values that start with this prefix are treated as secrets
