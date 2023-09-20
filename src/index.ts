@@ -1,5 +1,3 @@
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-
 import type {
   Serverless,
   ServerlessSecretHooks,
@@ -7,6 +5,7 @@ import type {
   ServerlessOptions,
   ServerlessCliOptions,
 } from './index.types';
+import { getSecret } from './aws/secret';
 
 class ServerlessAWSSecret {
   Error: ErrorConstructor;
@@ -33,18 +32,21 @@ class ServerlessAWSSecret {
       `[serverless-aws-secrets]: Loading secret: ${this.options.secretId} in ${this.serverless.service.provider.region}`,
     );
 
-    const client = new SecretsManagerClient({ region: this.serverless.service.provider.region });
-    const command = new GetSecretValueCommand({ SecretId: this.options.secretId });
-
-    const { SecretString } = await client.send(command);
-    if (!SecretString) {
-      throw new this.Error(`Failed to retrieve the secret: ${this.options.secretId}`);
-    }
-
-    const secrets = JSON.parse(SecretString);
+    const secretString = await getSecret(this.options.secretId!, this.serverless.service.provider.region);
+    const secrets = JSON.parse(secretString);
 
     let replaceCount = 0;
-    for (const [key, value] of Object.entries(this.serverless.service.provider.environment)) {
+    replaceCount += this.replaceSecrets(this.serverless.service.provider.environment, secrets);
+
+    this.log.success(`[serverless-aws-secrets]: Replaced ${replaceCount} secrets in environment variables`);
+  }
+
+  replaceSecrets(environment: { [key: string]: string }, secrets: { [key: string]: string }, replacedCount = 0) {
+    if (!environment) {
+      return replacedCount;
+    }
+
+    for (const [key, value] of Object.entries(environment)) {
       if (value?.startsWith(this.options.secretPrefix!)) {
         const secretKey = value.replace(this.options.secretPrefix!, '');
 
@@ -54,13 +56,13 @@ class ServerlessAWSSecret {
 
         this.log.verbose(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
 
-        this.serverless.service.provider.environment[key] = secrets[secretKey];
+        environment[key] = secrets[secretKey];
 
-        ++replaceCount;
+        ++replacedCount;
       }
     }
 
-    this.log.success(`[serverless-aws-secrets]: Replaced ${replaceCount} secrets in environment variables`);
+    return replacedCount;
   }
 
   setOptions(serverless: Serverless) {
