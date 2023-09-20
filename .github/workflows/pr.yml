@@ -32,3 +32,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Verify plugin can be built
         run: npm run build
+      - name: Run E2E tests
+        run: |
+          cd tests
+          npx sls package
