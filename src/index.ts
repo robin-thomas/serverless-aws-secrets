@@ -29,6 +29,8 @@ class ServerlessAWSSecret {
   }
 
   async loadSecrets() {
+    this.log.verbose(`[serverless-aws-secrets]: Loading secrets from ${this.options.secretId}`);
+
     const client = new SecretsManagerClient({ region: this.serverless.service.provider.region });
     const command = new GetSecretValueCommand({ SecretId: this.options.secretId });
 

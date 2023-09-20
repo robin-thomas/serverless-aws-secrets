@@ -1,8 +1,6 @@
 {
-  "name": "@serverless-aws-secrets/test",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "name": "test",
+  "private": true,
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.414.0",
     "serverless": "^3.35.2",
