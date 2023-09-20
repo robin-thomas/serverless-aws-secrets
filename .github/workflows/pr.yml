@@ -35,4 +35,5 @@ jobs:
       - name: Run E2E tests
         run: |
           cd tests
+          npm ci
           npx sls package
