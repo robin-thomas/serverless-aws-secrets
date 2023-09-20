@@ -114,6 +114,20 @@ describe('index.ts', () => {
       await expect(plugin.loadSecrets()).rejects.toThrowError('Failed to retrieve the secret: stage/app-service');
     });
 
+    test('found the secret, but no secrets to replace', async () => {
+      const serverless = getServerless();
+      serverless.service.provider.environment = undefined;
+
+      nock(/secretsmanager.eu-west-1.amazonaws.com/)
+        .post('/')
+        .reply(200, { SecretString: JSON.stringify({}) });
+
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
+      await plugin.loadSecrets();
+
+      expect(console.log).toBeCalledWith('[serverless-aws-secrets]: Replaced 0 secrets in environment variables');
+    });
+
     test('found the secret, but secret key missing', async () => {
       const serverless = getServerless();
       serverless.service.provider.environment = { MYSQL_PASSWORD: 'secret:MYSQL_PASSWORD' };

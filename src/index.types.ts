@@ -8,7 +8,7 @@ export interface Serverless {
     provider: {
       stage: string;
       region: string;
-      environment: {
+      environment?: {
         [key: string]: string;
       };
     };

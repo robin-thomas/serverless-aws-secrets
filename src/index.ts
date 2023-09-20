@@ -35,13 +35,13 @@ class ServerlessAWSSecret {
     const secretString = await getSecret(this.options.secretId!, this.serverless.service.provider.region);
     const secrets = JSON.parse(secretString);
 
-    let replaceCount = 0;
-    replaceCount += this.replaceSecrets(this.serverless.service.provider.environment, secrets);
+    let replacedCount = 0;
+    replacedCount += this.replaceSecrets(secrets, replacedCount, this.serverless.service.provider?.environment);
 
-    this.log.success(`[serverless-aws-secrets]: Replaced ${replaceCount} secrets in environment variables`);
+    this.log.success(`[serverless-aws-secrets]: Replaced ${replacedCount} secrets in environment variables`);
   }
 
-  replaceSecrets(environment: { [key: string]: string }, secrets: { [key: string]: string }, replacedCount = 0) {
+  replaceSecrets(secrets: { [key: string]: string }, replacedCount: number, environment?: { [key: string]: string }) {
     if (!environment) {
       return replacedCount;
     }
