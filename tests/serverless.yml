@@ -16,5 +16,9 @@ functions:
   function1:
     handler: index.handler
 
+package:
+  patterns:
+    '!node_modules/**'
+
 plugins:
   - serverless-aws-secrets
