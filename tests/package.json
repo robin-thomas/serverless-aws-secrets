@@ -1,0 +1,9 @@
+{
+  "name": "test",
+  "private": true,
+  "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.414.0",
+    "serverless": "^3.35.2",
+    "serverless-aws-secrets": "file:.."
+  }
+}

@@ -29,11 +29,14 @@ class ServerlessAWSSecret {
   }
 
   async loadSecrets() {
+    this.log.verbose(
+      `[serverless-aws-secrets]: Loading secret: ${this.options.secretId} in ${this.serverless.service.provider.region}`,
+    );
+
     const client = new SecretsManagerClient({ region: this.serverless.service.provider.region });
     const command = new GetSecretValueCommand({ SecretId: this.options.secretId });
 
     const { SecretString } = await client.send(command);
-
     if (!SecretString) {
       throw new this.Error(`Failed to retrieve the secret: ${this.options.secretId}`);
     }

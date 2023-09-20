@@ -1,0 +1,24 @@
+service: tests
+frameworkVersion: '3'
+
+custom:
+  serverless-aws-secrets:
+    secretId: 'test/serverless-aws-secrets/test'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-southeast-1
+  environment:
+    MYSQL_USER: secret:MYSQL_USER
+
+functions:
+  function1:
+    handler: index.handler
+
+package:
+  patterns:
+    '!node_modules/**'
+
+plugins:
+  - serverless-aws-secrets
