@@ -37,3 +37,6 @@ jobs:
           cd tests
           npm ci
           npx sls package
+        env:
+          AWS_ACCESS_KEY_ID: 'dummy_key_id'
+          AWS_SECRET_ACCESS_KEY: 'dummy_secret_key'
