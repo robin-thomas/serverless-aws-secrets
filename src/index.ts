@@ -38,12 +38,18 @@ class ServerlessAWSSecret {
   }
 
   async loadSecrets(cli = false) {
+    if (cli) {
+      this.log.verbose('[serverless-aws-secrets]: Running the command: sls aws-secrets');
+    }
+
     const secrets = await getSecret(this.options.secretId!, this.serverless.service.provider.region, this.log.verbose);
 
     let replacedCount = 0;
     replacedCount += this.replaceSecrets(secrets, replacedCount, this.serverless.service.provider?.environment, cli);
 
-    this.log.success(`[serverless-aws-secrets]: Replaced ${replacedCount} secrets in environment variables`);
+    if (!cli) {
+      this.log.success(`[serverless-aws-secrets]: Replaced ${replacedCount} secrets in environment variables`);
+    }
   }
 
   replaceSecrets(
