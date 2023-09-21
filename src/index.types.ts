@@ -8,7 +8,7 @@ export interface Serverless {
     provider: {
       stage: string;
       region: string;
-      environment: {
+      environment?: {
         [key: string]: string;
       };
     };
@@ -30,8 +30,18 @@ export interface ServerlessOptions {
   log?: {
     verbose: (message: string) => void;
     success: (message: string) => void;
+    warning: (message: string) => void;
   };
 }
+
+export interface ServerlessSecretCommands {
+  [key: string]: {
+    usage?: string;
+    lifecycleEvents: string[];
+  };
+}
+
+export type ServerlessSecretObject = { [key: string]: string };
 
 export interface ServerlessSecretOptions {
   /**

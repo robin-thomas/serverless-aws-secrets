@@ -1,15 +1,17 @@
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-
 import type {
   Serverless,
+  ServerlessSecretCommands,
   ServerlessSecretHooks,
   ServerlessSecretOptions,
   ServerlessOptions,
   ServerlessCliOptions,
+  ServerlessSecretObject,
 } from './index.types';
+import { getSecret } from './aws/secret';
 
 class ServerlessAWSSecret {
   Error: ErrorConstructor;
+  commands: ServerlessSecretCommands;
   hooks: ServerlessSecretHooks;
   log: NonNullable<ServerlessOptions['log']>;
   options: ServerlessSecretOptions;
@@ -22,45 +24,69 @@ class ServerlessAWSSecret {
     this.serverless = serverless;
     this.Error = serverless.classes?.Error ?? Error;
 
+    this.commands = {
+      'aws-secrets': {
+        lifecycleEvents: ['load'],
+      },
+    };
+
     this.hooks = {
       'before:package:initialize': this.loadSecrets.bind(this),
       'offline:start:init': this.loadSecrets.bind(this),
+      'aws-secrets:load': this.loadSecrets.bind(this, true),
     };
   }
 
-  async loadSecrets() {
-    this.log.verbose(
-      `[serverless-aws-secrets]: Loading secret: ${this.options.secretId} in ${this.serverless.service.provider.region}`,
-    );
-
-    const client = new SecretsManagerClient({ region: this.serverless.service.provider.region });
-    const command = new GetSecretValueCommand({ SecretId: this.options.secretId });
-
-    const { SecretString } = await client.send(command);
-    if (!SecretString) {
-      throw new this.Error(`Failed to retrieve the secret: ${this.options.secretId}`);
+  async loadSecrets(cli = false) {
+    if (cli) {
+      this.log.verbose('[serverless-aws-secrets]: Running the command: sls aws-secrets');
     }
 
-    const secrets = JSON.parse(SecretString);
+    const secrets = await getSecret(this.options.secretId!, this.serverless.service.provider.region, this.log.verbose);
 
-    let replaceCount = 0;
-    for (const [key, value] of Object.entries(this.serverless.service.provider.environment)) {
+    let replacedCount = 0;
+    replacedCount += this.replaceSecrets(secrets, replacedCount, this.serverless.service.provider?.environment, cli);
+
+    if (!cli) {
+      this.log.success(`[serverless-aws-secrets]: Replaced ${replacedCount} secrets in environment variables`);
+    }
+  }
+
+  replaceSecrets(
+    secrets: ServerlessSecretObject,
+    replacedCount: number,
+    environment?: ServerlessSecretObject,
+    cli?: boolean,
+  ) {
+    if (!environment) {
+      return replacedCount;
+    }
+
+    for (const [key, value] of Object.entries(environment)) {
       if (value?.startsWith(this.options.secretPrefix!)) {
         const secretKey = value.replace(this.options.secretPrefix!, '');
 
-        if (!secrets[secretKey]) {
-          throw new this.Error(`Secret ${secretKey} do not exist`);
+        if (cli) {
+          if (!secrets[secretKey]) {
+            this.log.warning(`[serverless-aws-secrets]: Secret ${secretKey} do not exist`);
+          } else {
+            this.log.success(`[serverless-aws-secrets]: Secret: ${key}, Value: ${secrets[secretKey]}`);
+          }
+        } else {
+          if (!secrets[secretKey]) {
+            throw new this.Error(`Secret ${secretKey} do not exist`);
+          }
+
+          this.log.verbose(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
         }
 
-        this.log.verbose(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
+        environment[key] = secrets[secretKey];
 
-        this.serverless.service.provider.environment[key] = secrets[secretKey];
-
-        ++replaceCount;
+        ++replacedCount;
       }
     }
 
-    this.log.success(`[serverless-aws-secrets]: Replaced ${replaceCount} secrets in environment variables`);
+    return replacedCount;
   }
 
   setOptions(serverless: Serverless) {
@@ -74,6 +100,7 @@ class ServerlessAWSSecret {
     this.log = {
       verbose: options?.log?.verbose ?? cliOptions?.verbose ? console.log : () => {},
       success: options?.log?.success ?? console.log,
+      warning: options?.log?.warning ?? console.warn,
     };
   }
 

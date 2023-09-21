@@ -92,6 +92,24 @@ custom:
 
 * `secretPrefix`: Prefix of the secret name in AWS Secrets Manager. Default: `secret:`
 
+## CLI commands
+
+This plugin also exposes a CLI command that can be used along with serverless.
+
+### Display the secret values
+
+```
+$ sls aws-secrets --verbose
+```
+
+This will display the output:
+
+```
+[serverless-aws-secrets]: Running the command: sls aws-secrets
+[serverless-aws-secrets]: Loading secret: {secretId} in {provider.region}
+✔ [serverless-aws-secrets]: Secret: {secretKey}, Value: {secretValue}
+```
+
 ## Local Development
 
 These instructions will help you to run the project in your local.

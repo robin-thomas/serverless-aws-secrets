@@ -17,9 +17,14 @@ const serverlessOptions = {};
 describe('index.ts', () => {
   beforeEach(() => {
     jest.spyOn(console, 'log').mockImplementation();
+    jest.spyOn(console, 'warn').mockImplementation();
   });
 
   describe('default options are set', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
     test('secretId and secretPrefix are not set', () => {
       const serverless = getServerless();
 
@@ -70,6 +75,7 @@ describe('index.ts', () => {
 
     afterAll(() => {
       nock.cleanAll();
+      jest.clearAllMocks();
     });
 
     test('if verbose is not set, its default value is false', async () => {
@@ -94,6 +100,7 @@ describe('index.ts', () => {
   describe('loading the secrets', () => {
     afterEach(() => {
       nock.cleanAll();
+      jest.clearAllMocks();
     });
 
     test('failed to connect to AWS', async () => {
@@ -112,6 +119,20 @@ describe('index.ts', () => {
 
       const plugin = new ServerlesssAwsSecrets(getServerless(), cliOptions, serverlessOptions);
       await expect(plugin.loadSecrets()).rejects.toThrowError('Failed to retrieve the secret: stage/app-service');
+    });
+
+    test('found the secret, but no secrets to replace', async () => {
+      const serverless = getServerless();
+      serverless.service.provider.environment = undefined;
+
+      nock(/secretsmanager.eu-west-1.amazonaws.com/)
+        .post('/')
+        .reply(200, { SecretString: JSON.stringify({}) });
+
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
+      await plugin.loadSecrets();
+
+      expect(console.log).toBeCalledWith('[serverless-aws-secrets]: Replaced 0 secrets in environment variables');
     });
 
     test('found the secret, but secret key missing', async () => {
@@ -138,6 +159,43 @@ describe('index.ts', () => {
 
       await plugin.loadSecrets();
       expect(serverless.service.provider.environment.MYSQL_PASSWORD).toBe('SECRET_MYSQL_PASSWORD');
+    });
+  });
+
+  describe('cli command', () => {
+    afterEach(() => {
+      nock.cleanAll();
+      jest.clearAllMocks();
+    });
+
+    test('found the secret, but secret key missing', async () => {
+      const serverless = getServerless();
+      serverless.service.provider.environment = { MYSQL_PASSWORD: 'secret:MYSQL_PASSWORD' };
+
+      nock(/secretsmanager.eu-west-1.amazonaws.com/)
+        .post('/')
+        .reply(200, { SecretString: JSON.stringify({}) });
+
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
+      await plugin.loadSecrets(true);
+
+      expect(console.warn).toBeCalledWith('[serverless-aws-secrets]: Secret MYSQL_PASSWORD do not exist');
+    });
+
+    test('found the secret, secret key is present', async () => {
+      const serverless = getServerless();
+      serverless.service.provider.environment = { MYSQL_PASSWORD: 'secret:MYSQL_PASSWORD' };
+
+      nock(/secretsmanager.eu-west-1.amazonaws.com/)
+        .post('/')
+        .reply(200, { SecretString: JSON.stringify({ MYSQL_PASSWORD: 'SECRET_MYSQL_PASSWORD' }) });
+
+      const plugin = new ServerlesssAwsSecrets(serverless, cliOptions, serverlessOptions);
+      await plugin.loadSecrets(true);
+
+      expect(console.log).toBeCalledWith(
+        '[serverless-aws-secrets]: Secret: MYSQL_PASSWORD, Value: SECRET_MYSQL_PASSWORD',
+      );
     });
   });
 });
