@@ -33,7 +33,7 @@ class ServerlessAWSSecret {
     this.hooks = {
       'before:package:initialize': this.loadSecrets.bind(this),
       'offline:start:init': this.loadSecrets.bind(this),
-      'aws-secrets:load': () => this.loadSecrets.call(this, true),
+      'aws-secrets:load': this.loadSecrets.bind(this, true),
     };
   }
 
