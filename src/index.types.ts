@@ -30,6 +30,7 @@ export interface ServerlessOptions {
   log?: {
     verbose: (message: string) => void;
     success: (message: string) => void;
+    warning: (message: string) => void;
   };
 }
 
@@ -39,6 +40,8 @@ export interface ServerlessSecretCommands {
     lifecycleEvents: string[];
   };
 }
+
+export type ServerlessSecretObject = { [key: string]: string };
 
 export interface ServerlessSecretOptions {
   /**

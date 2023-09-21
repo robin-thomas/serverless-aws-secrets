@@ -5,6 +5,7 @@ import type {
   ServerlessSecretOptions,
   ServerlessOptions,
   ServerlessCliOptions,
+  ServerlessSecretObject,
 } from './index.types';
 import { getSecret } from './aws/secret';
 
@@ -32,25 +33,25 @@ class ServerlessAWSSecret {
     this.hooks = {
       'before:package:initialize': this.loadSecrets.bind(this),
       'offline:start:init': this.loadSecrets.bind(this),
-      'aws-secrets:load': this.loadSecrets.bind(this),
+      'aws-secrets:load': () => this.loadSecrets.call(this, true),
     };
   }
 
-  async loadSecrets() {
-    this.log.verbose(
-      `[serverless-aws-secrets]: Loading secret: ${this.options.secretId} in ${this.serverless.service.provider.region}`,
-    );
-
-    const secretString = await getSecret(this.options.secretId!, this.serverless.service.provider.region);
-    const secrets = JSON.parse(secretString);
+  async loadSecrets(cli = false) {
+    const secrets = await getSecret(this.options.secretId!, this.serverless.service.provider.region, this.log.verbose);
 
     let replacedCount = 0;
-    replacedCount += this.replaceSecrets(secrets, replacedCount, this.serverless.service.provider?.environment);
+    replacedCount += this.replaceSecrets(secrets, replacedCount, this.serverless.service.provider?.environment, cli);
 
     this.log.success(`[serverless-aws-secrets]: Replaced ${replacedCount} secrets in environment variables`);
   }
 
-  replaceSecrets(secrets: { [key: string]: string }, replacedCount: number, environment?: { [key: string]: string }) {
+  replaceSecrets(
+    secrets: ServerlessSecretObject,
+    replacedCount: number,
+    environment?: ServerlessSecretObject,
+    cli?: boolean,
+  ) {
     if (!environment) {
       return replacedCount;
     }
@@ -59,11 +60,19 @@ class ServerlessAWSSecret {
       if (value?.startsWith(this.options.secretPrefix!)) {
         const secretKey = value.replace(this.options.secretPrefix!, '');
 
-        if (!secrets[secretKey]) {
-          throw new this.Error(`Secret ${secretKey} do not exist`);
-        }
+        if (cli) {
+          if (!secrets[secretKey]) {
+            this.log.warning(`[serverless-aws-secrets]: Secret ${secretKey} do not exist`);
+          } else {
+            this.log.success(`[serverless-aws-secrets]: Secret: ${key}, Value: ${secrets[secretKey]}`);
+          }
+        } else {
+          if (!secrets[secretKey]) {
+            throw new this.Error(`Secret ${secretKey} do not exist`);
+          }
 
-        this.log.verbose(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
+          this.log.verbose(`[serverless-aws-secrets]: Replacing ${key} with secret of ${secretKey}`);
+        }
 
         environment[key] = secrets[secretKey];
 
@@ -85,6 +94,7 @@ class ServerlessAWSSecret {
     this.log = {
       verbose: options?.log?.verbose ?? cliOptions?.verbose ? console.log : () => {},
       success: options?.log?.success ?? console.log,
+      warning: options?.log?.warning ?? console.warn,
     };
   }
 

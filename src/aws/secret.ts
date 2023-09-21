@@ -1,6 +1,12 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
-export const getSecret = async (secretId: string, region: string): Promise<string> => {
+export const getSecret = async (
+  secretId: string,
+  region: string,
+  logger: (message: string) => void,
+): Promise<{ [key: string]: string }> => {
+  logger(`[serverless-aws-secrets]: Loading secret: ${secretId} in ${region}`);
+
   const client = new SecretsManagerClient({ region });
   const command = new GetSecretValueCommand({ SecretId: secretId });
 
@@ -9,5 +15,5 @@ export const getSecret = async (secretId: string, region: string): Promise<strin
     throw new Error(`Failed to retrieve the secret: ${secretId}`);
   }
 
-  return SecretString;
+  return JSON.parse(SecretString);
 };
