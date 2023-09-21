@@ -4,6 +4,7 @@ coverage
 dist/index.types.js
 dist/index.spec.js
 src
+tests
 .commitlintrc.yaml
 .eslintrc.yml
 .lintstagedrc.yml
