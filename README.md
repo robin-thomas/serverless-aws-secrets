@@ -1,5 +1,6 @@
 <p align="center">
-  <h2 align="center">Serverless AWS Secrets</h2>
+  <h2 align="center">Serverless AWS Secrets <span><a href="https://twitter.com/intent/tweet?text=Replace%20your%20environment%20variables%20with%20AWS%20secrets&amp;url=https://github.com/robin-thomas/serverless-aws-secrets&amp;hashtags=serverless,plugin,typescript,javascript,developers" rel="nofollow"><img src="https://camo.githubusercontent.com/90bc908826728c0e4261acfff5619fd732c7be2b2a00624fce6363c9a3623c90/68747470733a2f2f696d672e736869656c64732e696f2f747769747465722f75726c2f687474702f736869656c64732e696f2e7376673f7374796c653d736f6369616c" alt="Tweet" data-canonical-src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" style="max-width: 100%;"></a></span></h2>
+
   <p align="center">A Serverless Plugin for the <a href="https://www.serverless.com">Serverless Framework</a>, which can replace environment variables with secrets from AWS Secrets Manager.</p>
   <div align="center">
     <img src="https://s3.amazonaws.com/assets.github.serverless/readme-serverless-framework.gif" width="70%" />
